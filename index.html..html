@@ -1,0 +1,218 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Слова Picture Quiz</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: quiz card on the left, progress ledger on the right; stacks on phones. Embroidery band as the one ornament. */
+:root{
+  --bg:#f3f5fb; --surface:#ffffff; --ink:#16213d; --muted:#5d6782; --line:#d9deeb;
+  --blue:#1f4fb5; --blue-soft:#e3eafb; --wheat:#f2c230; --wheat-soft:#fdf3d2;
+  --good:#1d8a52; --good-soft:#dff3e8; --bad:#c23b3b; --bad-soft:#fbe4e4;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Golos Text", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1528; --surface:#182141; --ink:#e9edf8; --muted:#9aa5c4; --line:#2b3760;
+  --blue:#7ea3ff; --blue-soft:#22305c; --wheat:#f5cd4c; --wheat-soft:#3a3420;
+  --good:#5fd394; --good-soft:#163a2a; --bad:#ff8a8a; --bad-soft:#45202a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1528; --surface:#182141; --ink:#e9edf8; --muted:#9aa5c4; --line:#2b3760;
+  --blue:#7ea3ff; --blue-soft:#22305c; --wheat:#f5cd4c; --wheat-soft:#3a3420;
+  --good:#5fd394; --good-soft:#163a2a; --bad:#ff8a8a; --bad-soft:#45202a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.band{height:12px;margin:0 auto 20px;max-width:1080px;border-radius:2px;
+  background:
+   repeating-linear-gradient(45deg,transparent 0 4px,var(--bg) 4px 5px),
+   repeating-linear-gradient(-45deg,var(--blue) 0 6px,var(--wheat) 6px 12px)}
+header{max-width:1080px;margin:0 auto 20px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;justify-content:space-between}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,4vw,2rem);margin:0;letter-spacing:-.01em}
+h1 span{color:var(--blue)}
+.sub{color:var(--muted);margin:0}
+main{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){main{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.prompt{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between;margin-bottom:18px}
+.label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.word{font-family:var(--display);font-weight:500;font-size:clamp(2rem,7vw,3.2rem);line-height:1.1;margin:4px 0 0;text-wrap:balance;overflow-wrap:anywhere}
+.speak{display:flex;align-items:center;gap:8px;border:0;background:var(--blue);color:var(--surface);font:600 1rem var(--body);
+  padding:12px 18px;border-radius:999px;cursor:pointer}
+.speak:hover{filter:brightness(1.08)}
+.speak svg{width:20px;height:20px}
+.voice-note{font-size:.8rem;color:var(--muted);margin:-8px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.opt{aspect-ratio:4/3;max-width:100%;border:2px solid var(--line);background:var(--bg);border-radius:12px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px;color:var(--ink);
+  transition:transform .12s, border-color .12s, background .12s}
+.opt:hover:not(:disabled){border-color:var(--blue);transform:translateY(-2px)}
+.opt .pic{font-size:clamp(2.6rem,9vw,4.2rem);line-height:1}
+.opt .cap{font-size:.85rem;color:var(--muted);font-weight:500}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.feedback{min-height:2.6em;margin:16px 0 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.feedback p{margin:0;font-weight:600}
+.feedback .ok{color:var(--good)} .feedback .no{color:var(--bad)}
+.next{border:2px solid var(--ink);background:transparent;color:var(--ink);font:600 1rem var(--body);padding:8px 18px;border-radius:999px;cursor:pointer}
+.next:hover{background:var(--ink);color:var(--surface)}
+button:focus-visible{outline:3px solid var(--wheat);outline-offset:2px}
+.tally{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.tally div{border-radius:10px;padding:10px 12px}
+.tally .k{background:var(--good-soft)} .tally .l{background:var(--wheat-soft)}
+.tally b{display:block;font-family:var(--display);font-size:1.8rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;width:0;background:var(--good);transition:width .4s}
+h2{font-family:var(--display);font-size:.95rem;font-weight:500;margin:14px 0 8px;display:flex;justify-content:space-between}
+h2 span{color:var(--muted);font-family:var(--body);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
+.chips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);font:500 .9rem var(--body);padding:4px 10px;border-radius:999px;cursor:pointer}
+.chips.known button{background:var(--good-soft);border-color:transparent}
+.chips button:hover{border-color:var(--blue)}
+.empty{color:var(--muted);font-size:.9rem;margin:0}
+.reset{margin-top:18px;border:0;background:none;color:var(--muted);font:500 .85rem var(--body);text-decoration:underline;cursor:pointer;padding:0}
+.reset-confirm{margin-top:10px;font-size:.9rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.reset-confirm button{font:600 .85rem var(--body);border-radius:999px;padding:4px 12px;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.reset-confirm .yes{background:var(--bad);color:var(--surface);border-color:var(--bad)}
+.done{text-align:center;padding:30px 10px}
+.done .word{font-size:clamp(1.8rem,6vw,2.6rem)}
+.done p{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="band" aria-hidden="true"></div>
+<header>
+  <h1>Слова <span>·</span> Lesson 2</h1>
+  <p class="sub">Listen, read the word, then tap the matching picture.</p>
+</header>
+
+<main>
+  <section class="panel" id="quiz" aria-live="polite"></section>
+  <aside class="panel">
+    <div class="tally">
+      <div class="k"><span class="label">Words I know</span><b id="nKnown">0</b></div>
+      <div class="l"><span class="label">Left to learn</span><b id="nLeft">0</b></div>
+    </div>
+    <div class="bar" role="progressbar" aria-label="Words learned" id="barWrap"><i id="bar"></i></div>
+    <h2>Still learning <span id="cLeft"></span></h2>
+    <ul class="chips" id="leftList"></ul>
+    <h2>I know these <span id="cKnown"></span></h2>
+    <ul class="chips known" id="knownList"></ul>
+    <button class="reset" id="resetBtn">Start over</button>
+    <div class="reset-confirm" id="resetConfirm" hidden>
+      Forget all progress?
+      <button class="yes" id="resetYes">Yes, reset</button>
+      <button id="resetNo">Cancel</button>
+    </div>
+  </aside>
+</main>
+
+<script>
+// "+" marks the stressed vowel; it becomes a combining acute accent.
+const RAW = [
+ ["Авока+до","avocado","🥑"],["Бо+рщ","borscht","🍲",1],["Буди+нок","house","🏠"],
+ ["Виклада+ч","male university teacher","👨‍🏫",1],["Виклада+чка","female university teacher","👩‍🏫",1],
+ ["Впра+ва","exercise","📝",1],["Жі+нка","woman","👩"],["Ка+ва","coffee","☕"],["Ка+рта","map","🗺️"],
+ ["Кіт","cat","🐈"],["Кни+га","book","📕"],["Комп’ю+тер","computer","🖥️"],["Лю+ди","people","🧑‍🤝‍🧑"],
+ ["Магази+н","shop","🏪"],["Ма+ма","mother","👩‍👧"],["Ма+нго","mango","🥭"],["Маши+на","car","🚗"],
+ ["Мі+сто","city","🏙️"],["Ноутбу+к","laptop","💻"],["Оліве+ць","pencil","✏️"],["Парк","park","🏞️"],
+ ["Па+рта","school desk","🏫🪵",1],["Прекра+сний","beautiful, wonderful","🌟",1],["Ре+чення","sentence","💬",1],
+ ["Ру+чка","pen","🖊️"],["Сім’я+","family","👨‍👩‍👧"],["Сті+л","table","🍽️",1],["Стіле+ць","chair","🪑"],
+ ["Студе+нт","male student","👨‍🎓",1],["Студе+нтка","female student","👩‍🎓",1],["Соба+ка","dog","🐕"],
+ ["Там","there","👉🏔️",1],["Та+то","father","👨‍👧"],["Телефо+н","telephone","📱"],["То","that","👉",1],
+ ["Тут","here","📍",1],["Університе+т","university","🏛️"],["Уро+к","lesson","📚",1],["Це","it, this","👇",1],
+ ["Чай","tea","🍵"],["Чолові+к","man, husband","👨"],["Шко+ла","school","🏫"],["Шокола+д","chocolate","🍫"]
+];
+const WORDS = RAW.map(([w,en,pic,cap],i)=>({id:i,uk:w.replace(/\+/g,"́"),plain:w.replace(/\+/g,""),en,pic,cap:!!cap}));
+const KEY="slova-lesson2-known";
+let known=new Set();
+try{ (JSON.parse(localStorage.getItem(KEY))||[]).forEach(i=>known.add(i)); }catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify([...known]))}catch(e){}};
+
+let current=null, missed=false, answered=false, lastId=null;
+const quiz=document.getElementById("quiz");
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+
+let ukVoice=null;
+function findVoice(){ if(!("speechSynthesis" in window))return;
+  ukVoice=speechSynthesis.getVoices().find(v=>/^uk/i.test(v.lang))||null; }
+if("speechSynthesis" in window){findVoice();speechSynthesis.onvoiceschanged=findVoice;}
+function say(text){
+  if(!("speechSynthesis" in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); u.lang="uk-UA"; if(ukVoice)u.voice=ukVoice; u.rate=.85;
+  speechSynthesis.speak(u);
+}
+const speakerSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+
+function nextWord(autoSpeak){
+  const pool=WORDS.filter(w=>!known.has(w.id));
+  if(!pool.length){renderDone();return;}
+  let choices=pool.filter(w=>w.id!==lastId); if(!choices.length)choices=pool;
+  current=choices[Math.random()*choices.length|0]; lastId=current.id;
+  missed=false; answered=false;
+  const others=shuffle(WORDS.filter(w=>w.id!==current.id)).slice(0,3);
+  const opts=shuffle([current,...others]);
+  const noVoice=("speechSynthesis" in window)&&speechSynthesis.getVoices().length&&!ukVoice;
+  quiz.innerHTML=`
+   <div class="prompt">
+     <div><div class="label">Which picture is…</div><p class="word" lang="uk">${current.uk}</p></div>
+     <button class="speak" id="speakBtn">${speakerSvg} Hear it</button>
+   </div>
+   ${noVoice?'<p class="voice-note">This device has no Ukrainian voice installed, so the pronunciation may sound off.</p>':''}
+   <div class="grid">${opts.map(o=>`<button class="opt" data-id="${o.id}" aria-label="${o.en}">
+      <span class="pic" aria-hidden="true">${o.pic}</span>${o.cap?`<span class="cap">${o.en}</span>`:""}</button>`).join("")}</div>
+   <div class="feedback" id="fb"></div>`;
+  document.getElementById("speakBtn").onclick=()=>say(current.plain);
+  quiz.querySelectorAll(".opt").forEach(b=>b.onclick=()=>pick(b));
+  if(autoSpeak)say(current.plain);
+}
+
+function pick(btn){
+  if(answered)return;
+  const id=+btn.dataset.id, fb=document.getElementById("fb");
+  if(id===current.id){
+    answered=true; btn.classList.add("right");
+    quiz.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+    if(!missed){known.add(current.id);save();renderLists();}
+    fb.innerHTML=`<p class="ok">${missed?`Got it. ${current.uk} means “${current.en}”. You’ll see it again.`:`Правильно! ${current.uk} means “${current.en}”.`}</p>
+      <button class="next" id="nextBtn">Next word →</button>`;
+    document.getElementById("nextBtn").onclick=()=>nextWord(true);
+    document.getElementById("nextBtn").focus();
+  }else{
+    missed=true; btn.classList.add("wrong"); btn.disabled=true;
+    const w=WORDS[id];
+    fb.innerHTML=`<p class="no">Not quite, that picture is “${w.en}”. Try again.</p>`;
+  }
+}
+
+function renderDone(){
+  quiz.innerHTML=`<div class="done"><div class="label">All ${WORDS.length} words</div>
+    <p class="word">Чудово! 🎉</p><p>You know every word from Lesson 2. Use “Start over” to practice again.</p></div>`;
+}
+
+function chip(w){return `<li><button lang="uk" data-say="${w.plain}" title="${w.en}">${w.uk}</button></li>`}
+function renderLists(){
+  const k=WORDS.filter(w=>known.has(w.id)), l=WORDS.filter(w=>!known.has(w.id));
+  document.getElementById("nKnown").textContent=k.length;
+  document.getElementById("nLeft").textContent=l.length;
+  document.getElementById("cKnown").textContent=k.length;
+  document.getElementById("cLeft").textContent=l.length;
+  document.getElementById("bar").style.width=(k.length/WORDS.length*100)+"%";
+  document.getElementById("barWrap").setAttribute("aria-valuenow",k.length);
+  document.getElementById("barWrap").setAttribute("aria-valuemax",WORDS.length);
+  document.getElementById("leftList").innerHTML=l.length?l.map(chip).join(""):'<li class="empty">Nothing left. Great work!</li>';
+  document.getElementById("knownList").innerHTML=k.length?k.map(chip).join(""):'<li class="empty">Answer a picture right on the first try to add it here.</li>';
+}
+document.querySelector("aside").addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)say(b.dataset.say)});
+
+const rc=document.getElementById("resetConfirm");
+document.getElementById("resetBtn").onclick=()=>{rc.hidden=false};
+document.getElementById("resetNo").onclick=()=>{rc.hidden=true};
+document.getElementById("resetYes").onclick=()=>{known.clear();save();rc.hidden=true;renderLists();nextWord(false)};
+
+renderLists(); nextWord(false);
+</script>
+
+</body></html>
